@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mysql = require("mysql2/promise");
 
 const connectDB = async () => {
   try {
@@ -15,4 +16,12 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+const createMySQLPool = (dbName, dbPassword) =>
+  mysql.createPool({
+    host: "localhost",
+    user: "root",
+    password: dbPassword,
+    database: dbName,
+  });
+
+module.exports = { connectDB, createMySQLPool };
