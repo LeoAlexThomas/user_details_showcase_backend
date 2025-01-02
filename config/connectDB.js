@@ -21,7 +21,7 @@ const connectDB = async () => {
 const createMySQLPool = () =>
   mysql.createPool({
     host: "localhost",
-    user: "root",
+    user: process.env.DBUSER,
     password: process.env.DBPASSWORD,
     database: process.env.DBNAME,
   });
@@ -29,7 +29,7 @@ const createMySQLPool = () =>
 // NOTE: Creating Sequelize Pool for MySQL Database
 const sequelizeConnection = new Sequelize(
   process.env.DBNAME,
-  "root",
+  process.env.DBUSER,
   process.env.DBPASSWORD,
   {
     host: "localhost",
