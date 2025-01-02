@@ -4,7 +4,7 @@
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- MongoDB Atlas account (or local MongoDB instance)
+- MySQL server / MongoDB Atlas account (or local MongoDB instance)
 
 ### Installation
 
