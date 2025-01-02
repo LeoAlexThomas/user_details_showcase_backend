@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
-const { connectDB, createMySQLPool } = require("../config/connectDB");
+const { sequelizeConnection: sequelize } = require("../config/connectDB");
 const errorHandler = require("../middlewares/errorHandler");
 const cors = require("cors");
 const Serverless = require("serverless-http");
@@ -11,8 +11,6 @@ const Serverless = require("serverless-http");
 const app = express();
 
 const port = process.env.PORT || 8081;
-const dbName = process.env.DBNAME;
-const dbPassword = process.env.DBPASSWORD;
 
 app.use(express.json());
 
@@ -30,17 +28,34 @@ app.use("/", require("../routes/userRoutes"));
 app.use(errorHandler);
 
 // Conditionally Listening for port
-createMySQLPool(dbName, dbPassword)
-  .query("SELECT 1") // NOTE: To check database connection we use query
-  .then(() => {
-    console.log("DB Connected");
+// const mySqlPool = createMySQLPool();
+// mySqlPool
+//   .query("SELECT 1") // NOTE: To check database connection we use query
+//   .then(() => {
+//     console.log("DB Connected");
+//     app.listen(port, () => {
+//       console.log("listening on port ", port);
+//     });
+//   })
+//   .catch((err) => {
+//     console.log("Mysql Pool error: ", err);
+//   });
+
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
+    // await sequelize.sync({ force: true });
+    // console.log("All models were synchronized successfully.");
     app.listen(port, () => {
       console.log("listening on port ", port);
     });
-  })
-  .catch((err) => {
-    console.log("Mysql Pool error: ", err);
-  });
+    // await sequelize.sync({ force: true }); // NOTE: This will drop all tables and recreate them
+    // console.log("All models were synchronized successfully.");
+  } catch (error) {
+    console.log("Error in DB Connection: ", error);
+  }
+})();
 
 const handler = Serverless(app);
 

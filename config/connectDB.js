@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const mysql = require("mysql2/promise");
+const { Sequelize } = require("sequelize");
 
 const connectDB = async () => {
   try {
@@ -16,12 +17,24 @@ const connectDB = async () => {
   }
 };
 
-const createMySQLPool = (dbName, dbPassword) =>
+// NOTE: Creating MySQL Pool
+const createMySQLPool = () =>
   mysql.createPool({
     host: "localhost",
     user: "root",
-    password: dbPassword,
-    database: dbName,
+    password: process.env.DBPASSWORD,
+    database: process.env.DBNAME,
   });
 
-module.exports = { connectDB, createMySQLPool };
+// NOTE: Creating Sequelize Pool for MySQL Database
+const sequelizeConnection = new Sequelize(
+  process.env.DBNAME,
+  "root",
+  process.env.DBPASSWORD,
+  {
+    host: "localhost",
+    dialect: "mysql",
+  }
+);
+
+module.exports = { connectDB, createMySQLPool, sequelizeConnection };
