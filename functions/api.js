@@ -1,16 +1,18 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
-const connectDB = require("../config/connectDB");
+const { connectDB, createMySQLPool } = require("../config/connectDB");
 const errorHandler = require("../middlewares/errorHandler");
 const cors = require("cors");
 const Serverless = require("serverless-http");
 
 // NOTE: Initiate the connection to database
-connectDB();
+// connectDB();
 
 const app = express();
 
 const port = process.env.PORT || 8081;
+const dbName = process.env.DBNAME;
+const dbPassword = process.env.DBPASSWORD;
 
 app.use(express.json());
 
@@ -27,9 +29,18 @@ app.use("/", require("../routes/userRoutes"));
 // To add error handlers for structured error messages
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log("listening on port ", port);
-});
+// Conditionally Listening for port
+createMySQLPool(dbName, dbPassword)
+  .query("SELECT 1") // NOTE: To check database connection we use query
+  .then(() => {
+    console.log("DB Connected");
+    app.listen(port, () => {
+      console.log("listening on port ", port);
+    });
+  })
+  .catch((err) => {
+    console.log("Mysql Pool error: ", err);
+  });
 
 const handler = Serverless(app);
 
